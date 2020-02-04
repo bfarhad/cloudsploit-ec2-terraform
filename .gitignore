@@ -1,0 +1,16 @@
+# Skip Ansible retry files
+**/*.retry
+
+# Skip macOS folder metadata
+**/.DS_Store
+
+#  Local .terraform directories
+**/.terraform/*
+
+# .tfstate files
+*.tfstate
+*.tfstate.*
+
+# .tfvars files
+*.tfvars
+
