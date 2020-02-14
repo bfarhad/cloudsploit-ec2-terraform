@@ -1,3 +1,11 @@
+terraform {
+  backend "s3" {
+    bucket                  = "hackaton-states"
+    key                     = "tf.state"
+    region                  = "eu-west-1"
+  }
+}
+
 provider "aws" {
   region = "eu-west-1"
   version = "~> 2.49"

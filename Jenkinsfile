@@ -15,7 +15,7 @@ pipeline {
             steps {
                 script {
                     sh"""
-                        terraform init
+                        terraform init -input=false -auto-approve
                     """
                 }
             }
