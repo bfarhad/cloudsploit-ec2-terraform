@@ -3,16 +3,16 @@ provider "aws" {
 }
 
 resource "aws_iam_user" "cloudsploit" {
-  name = "${var.username}"
+  name = var.username
 }
 
 resource "aws_iam_access_key" "cloudsploit" {
-  user = "${aws_iam_user.cloudsploit.name}"
+  user = aws_iam_user.cloudsploit.name
 }
 
 resource "aws_iam_user_policy_attachment" "cloudsploit" {
-  user = "${aws_iam_user.cloudsploit.name}"
-  policy_arn = "${var.security_audit_arn}" 
+  user = "aws_iam_user.cloudsploit.name"
+  policy_arn = var.security_audit_arn
 }
 
 resource "aws_eip" "my_static_ip" {
@@ -24,16 +24,16 @@ resource "aws_eip" "my_static_ip" {
 }
 
 data "aws_vpc" "selected" {
-  id = "${var.vpc_id}"
+  id = var.vpc_id
 }
 
 
 resource "aws_instance" "my_server_scan" {
-  ami                    = "${var.ami_id}"
+  ami                    = "var.ami_id"
   instance_type          = "t2.medium"
   vpc_security_group_ids = [aws_security_group.my_scaner.id]
-  subnet_id = "${var.subnet_pub_C}"
-  key_name = "${var.key_name}"
+  subnet_id = var.subnet_pub_C
+  key_name = var.key_name
 
   tags = {
     Name = "cloudsploit-demo-scanner"
@@ -55,7 +55,7 @@ EOF
 
 resource "aws_security_group" "my_scaner" {
   name = "My Security Group"
-  vpc_id = "${var.vpc_id}"
+  vpc_id = var.vpc_id
   dynamic "ingress" {
     for_each = ["80", "443", "22"]
     content {
