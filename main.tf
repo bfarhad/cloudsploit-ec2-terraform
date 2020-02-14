@@ -54,9 +54,9 @@ curl -sL https://rpm.nodesource.com/setup_10.x | sudo bash -
 sudo yum -y install nodejs
 git clone https://github.com/cloudsploit/scans.git
 cd scans/
-export AWS_ACCESS_KEY_ID=var.AWS_ACCESS_KEY_ID
-export AWS_SECRET_ACCESS_KEY=var.AWS_SECRET_ACCESS_KEY
-export AWS_DEFAULT_REGION=eu-west-1
+echo "export AWS_ACCESS_KEY_ID=${var.AWS_ACCESS_KEY_ID}" >> /etc/profile
+echo "export AWS_SECRET_ACCESS_KEY=${var.AWS_SECRET_ACCESS_KEY}" >> /etc/profile
+echo "export AWS_DEFAULT_REGION=eu-west-1" >> /etc/profile
 npm install
 node index.js --csv=./out1full.csv
 node index.js --compliance=hipaa --csv=./out2hipaa.csv
