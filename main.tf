@@ -62,7 +62,7 @@ node index.js --csv=./out1full.csv
 node index.js --compliance=hipaa --csv=./out2hipaa.csv
 node index.js --compliance=pci --csv=./out3pci.csv
 find . -maxdepth 1 -type f -name "out*.csv" | sed 's!.*/!!'| zip scan.zip -@
-echo "This is your security scan" | mail -s "Cloudsploit SecScan" vadims.stavro@gmail.com -A scan.zip
+echo "This is your security scan" | mail -s vadims.stavro@gmail.com -a scan.zip
 EOF
 }
 
