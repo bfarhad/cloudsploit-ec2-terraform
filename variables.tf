@@ -3,12 +3,12 @@ variable "s3_bucket" {
 }
 
 variable "username" {
-  type = "string"
+  type = string
   default = "cloudsploit"
 }
 
 variable "security_audit_arn" {
-  type = "string"
+  type = string
   default = "arn:aws:iam::aws:policy/SecurityAudit"
 }
 
@@ -16,3 +16,9 @@ variable "ami_id" {
   description = "AMI ID"
   default = "ami-192a9460"
 }
+
+variable "key_name" { }
+
+variable "vpc_id" { }
+
+variable "subnet_pub_C" { }

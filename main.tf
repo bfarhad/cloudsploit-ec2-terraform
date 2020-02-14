@@ -11,7 +11,7 @@ resource "aws_iam_access_key" "cloudsploit" {
 }
 
 resource "aws_iam_user_policy_attachment" "cloudsploit" {
-  user = "aws_iam_user.cloudsploit.name"
+  user = aws_iam_user.cloudsploit.name
   policy_arn = var.security_audit_arn
 }
 
