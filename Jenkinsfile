@@ -4,7 +4,7 @@ pipeline {
 
     environment{
         AWS_DEFAULT_REGION = "eu-west-1" 
-        credentialsId = 'Account Credentials ID'
+        credentialsId = 'jenkinsCiCd'
         TF_VAR_vpc_id = 'vpc-09cf4efbd803372b6'
         TF_VAR_subnet_pub_C = 'subnet-09fd71f109d04d274'
         TF_VAR_key_name = 'ec2-key'
