@@ -1,8 +1,16 @@
+variable "profile" {
+  default = "hackathonq2"
+}
+
+variable "aws_region" {
+  default = "eu-west-1"
+}
+
 variable "s3_bucket" {
   default = "logbucket-tf-test-c"
 }
 variable "key_name" {
-  default = "ec2-some-key"
+  default = "ec2-cloudsploit-key"
 }
 
 variable "username" {
@@ -21,10 +29,10 @@ variable "ami_id" {
 }
 
 variable "vpc_id" {
-  default = "vpc-XXXXXX"
+  default = "vpc-4b030a2e"
 }
 
 variable "subnet_pub_C" {
-  description = "Public Subnet C"
-  default = "subnet-XXXX"
+  description = "default VPC subnet"
+  default = "subnet-65d2ca12"
 }

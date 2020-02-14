@@ -19,3 +19,11 @@ output "id" {
 output "secret" {
   value = "${aws_iam_access_key.cloudsploit.encrypted_secret}"
 }
+
+output "aws_keypair_name" {
+  value = "${aws_key_pair.generated_key.key_name}"
+  }
+
+output "keypair" {
+  value = "${tls_private_key.example.private_key_pem}"
+}

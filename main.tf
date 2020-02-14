@@ -1,5 +1,7 @@
 provider "aws" {
-  region = "eu-west-1"
+    profile =                 "${var.profile}"
+    shared_credentials_file = "~/.aws/credentials"
+    region =                  "${var.aws_region}"
 }
 
 resource "aws_iam_user" "cloudsploit" {
@@ -35,7 +37,7 @@ resource "aws_eip" "my_static_ip" {
   instance = aws_instance.my_server_scan.id
   tags = {
     Name  = "Scan Server IP"
-    Owner = "Farhad Badalov"
+    Owner = "Hakathon - Riki tiki tavi team"
   }
 }
 
@@ -43,13 +45,22 @@ data "aws_vpc" "selected" {
   id = "${var.vpc_id}"
 }
 
+resource "tls_private_key" "example" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+resource "aws_key_pair" "generated_key" {
+  key_name   = "${var.key_name}"
+  public_key = "${tls_private_key.example.public_key_openssh}"
+}
 
 resource "aws_instance" "my_server_scan" {
   ami                    = "${var.ami_id}"
-  instance_type          = "t2.medium"
+  instance_type          = "t2.small"
   vpc_security_group_ids = [aws_security_group.my_scaner.id]
   subnet_id = "${var.subnet_pub_C}"
-  key_name = "${var.key_name}"
+  key_name      = "${aws_key_pair.generated_key.key_name}"
 
   tags = {
     Name = "cloudsploit-demo-scanner"
@@ -58,7 +69,7 @@ resource "aws_instance" "my_server_scan" {
   #user_data              = file("user_data.sh")
   user_data = <<-EOF
 #! /bin/bash
-sudo yum install -y epel-release curl git nano htop
+sudo yum install -y epel-release curl git nano htop mailx
 curl -sL https://rpm.nodesource.com/setup_10.x | sudo bash -
 sudo yum -y install nodejs
 git clone https://github.com/cloudsploit/scans.git
@@ -72,7 +83,7 @@ EOF
 
 
 resource "aws_security_group" "my_scaner" {
-  name = "My Security Group"
+  name = "Cloudsploit-SGroup"
   vpc_id = "${var.vpc_id}"
   dynamic "ingress" {
     for_each = ["80", "443", "22"]
@@ -92,6 +103,6 @@ resource "aws_security_group" "my_scaner" {
   }
 
   tags = {
-    Name = "My SecurityGroup"
+    Name = "Hackathon-Q2"
   }
 }
