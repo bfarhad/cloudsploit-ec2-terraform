@@ -30,7 +30,7 @@ data "aws_vpc" "selected" {
 
 
 resource "aws_instance" "my_server_scan" {
-  ami                    = "var.ami_id"
+  ami                    = var.ami_id
   instance_type          = "t2.medium"
   vpc_security_group_ids = [aws_security_group.my_scaner.id]
   subnet_id = var.subnet_pub_C
