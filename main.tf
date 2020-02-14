@@ -74,10 +74,15 @@ curl -sL https://rpm.nodesource.com/setup_10.x | sudo bash -
 sudo yum -y install nodejs
 git clone https://github.com/cloudsploit/scans.git
 cd scans/
+export AWS_ACCESS_KEY_ID=XXXXXXX
+export AWS_SECRET_ACCESS_KEY=XXXXX
+export AWS_DEFAULT_REGION=eu-west-1
 npm install
 node index.js --csv=./out1full.csv
 node index.js --compliance=hipaa --csv=./out2hipaa.csv
 node index.js --compliance=pci --csv=./out3pci.csv
+find . -maxdepth 1 -type f -name "out*.csv" | sed 's!.*/!!'| zip scan.zip -@
+echo "This is your security scan" | mail -s "Cloudsploit SecScan" farkhad.badalov@gmail.com -A scan.zip
 EOF
 }
 
