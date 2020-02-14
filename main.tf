@@ -3,14 +3,6 @@ provider "aws" {
   version = "~> 2.49"
 }
 
-terraform {
-  backend "s3" {
-    bucket                  = "hackaton-states"
-    key                     = "tf.state"
-    region                  = "eu-west-1"
-  }
-}
-
 resource "aws_iam_user" "cloudsploit" {
   name = var.username
 }
