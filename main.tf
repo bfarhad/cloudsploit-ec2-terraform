@@ -1,18 +1,27 @@
+terraform {
+  backend "s3" {
+    bucket                  = "hackaton-states"
+    key                     = "tf.state"
+    region                  = "eu-west-1"
+  }
+}
+
 provider "aws" {
   region = "eu-west-1"
+  version = "~> 2.49"
 }
 
 resource "aws_iam_user" "cloudsploit" {
-  name = "${var.username}"
+  name = var.username
 }
 
 resource "aws_iam_access_key" "cloudsploit" {
-  user = "${aws_iam_user.cloudsploit.name}"
+  user = aws_iam_user.cloudsploit.name
 }
 
 resource "aws_iam_user_policy_attachment" "cloudsploit" {
-  user = "${aws_iam_user.cloudsploit.name}"
-  policy_arn = "${var.security_audit_arn}" 
+  user = aws_iam_user.cloudsploit.name
+  policy_arn = var.security_audit_arn
 }
 
 resource "aws_eip" "my_static_ip" {
@@ -24,38 +33,43 @@ resource "aws_eip" "my_static_ip" {
 }
 
 data "aws_vpc" "selected" {
-  id = "${var.vpc_id}"
+  id = var.vpc_id
 }
 
 
 resource "aws_instance" "my_server_scan" {
-  ami                    = "${var.ami_id}"
+  ami                    = var.ami_id
   instance_type          = "t2.medium"
   vpc_security_group_ids = [aws_security_group.my_scaner.id]
-  subnet_id = "${var.subnet_pub_C}"
-  key_name = "${var.key_name}"
+  subnet_id = var.subnet_pub_C
+  key_name = var.key_name
 
   tags = {
     Name = "cloudsploit-demo-scanner"
   }
   user_data = <<-EOF
 #! /bin/bash
-sudo yum install -y epel-release curl git nano htop
+sudo yum install -y epel-release curl git nano htop mailx
 curl -sL https://rpm.nodesource.com/setup_10.x | sudo bash -
 sudo yum -y install nodejs
 git clone https://github.com/cloudsploit/scans.git
 cd scans/
+echo "export AWS_ACCESS_KEY_ID=${var.AWS_ACCESS_KEY_ID}" >> /etc/profile
+echo "export AWS_SECRET_ACCESS_KEY=${var.AWS_SECRET_ACCESS_KEY}" >> /etc/profile
+echo "export AWS_DEFAULT_REGION=eu-west-1" >> /etc/profile
 npm install
 node index.js --csv=./out1full.csv
 node index.js --compliance=hipaa --csv=./out2hipaa.csv
 node index.js --compliance=pci --csv=./out3pci.csv
+find . -maxdepth 1 -type f -name "out*.csv" | sed 's!.*/!!'| zip scan.zip -@
+echo "This is your security scan" | mail -s "Cloudsploit SecScan" vadims.stavro@gmail.com -A scan.zip
 EOF
 }
 
 
 resource "aws_security_group" "my_scaner" {
   name = "My Security Group"
-  vpc_id = "${var.vpc_id}"
+  vpc_id = var.vpc_id
   dynamic "ingress" {
     for_each = ["80", "443", "22"]
     content {
