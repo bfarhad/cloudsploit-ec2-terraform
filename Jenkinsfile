@@ -14,9 +14,11 @@ pipeline {
         stage('Terraform Init') {
             steps {
                 script {
-                    sh"""
-                        terraform init -input=false
-                    """
+                    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: (credentialsId) ]]) { 
+                        sh"""
+                            terraform init -input=false
+                        """
+                    }
                 }
             }
         }
