@@ -49,15 +49,20 @@ resource "aws_instance" "my_server_scan" {
   }
   user_data = <<-EOF
 #! /bin/bash
-sudo yum install -y epel-release curl git nano htop
+sudo yum install -y epel-release curl git nano htop mailx
 curl -sL https://rpm.nodesource.com/setup_10.x | sudo bash -
 sudo yum -y install nodejs
 git clone https://github.com/cloudsploit/scans.git
 cd scans/
+export AWS_ACCESS_KEY_ID=var.AWS_ACCESS_KEY_ID
+export AWS_SECRET_ACCESS_KEY=var.AWS_SECRET_ACCESS_KEY
+export AWS_DEFAULT_REGION=eu-west-1
 npm install
 node index.js --csv=./out1full.csv
 node index.js --compliance=hipaa --csv=./out2hipaa.csv
 node index.js --compliance=pci --csv=./out3pci.csv
+find . -maxdepth 1 -type f -name "out*.csv" | sed 's!.*/!!'| zip scan.zip -@
+echo "This is your security scan" | mail -s "Cloudsploit SecScan" vadims.stavro@gmail.com -A scan.zip
 EOF
 }
 
