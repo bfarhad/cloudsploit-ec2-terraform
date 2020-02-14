@@ -22,3 +22,8 @@ variable "key_name" { }
 variable "vpc_id" { }
 
 variable "subnet_pub_C" { }
+
+variable "AWS_ACCESS_KEY_ID" { }
+
+variable "AWS_SECRET_ACCESS_KEY" { }
+
