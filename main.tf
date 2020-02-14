@@ -3,33 +3,17 @@ provider "aws" {
 }
 
 resource "aws_iam_user" "cloudsploit" {
-  #count = "${length(var.username)}"
   name = "${var.username}"
-  #${element(var.username,count.index )}
 }
 
 resource "aws_iam_access_key" "cloudsploit" {
   user = "${aws_iam_user.cloudsploit.name}"
-  #pgp_key = "keybase:cloudsploit"
 }
 
 resource "aws_iam_user_policy_attachment" "cloudsploit" {
-  #name = "cloudsploit_iam_policy"
   user = "${aws_iam_user.cloudsploit.name}"
   policy_arn = "${var.security_audit_arn}" 
 }
-
-/*
-resource "aws_s3_bucket" "logbucket" {
-  bucket = "${var.s3_bucket}"
-  acl    = "private"
-
-  tags = {
-    Name        = "Log-bucket"
-    Environment = "Dev"
-  }
-}
-*/
 
 resource "aws_eip" "my_static_ip" {
   instance = aws_instance.my_server_scan.id
@@ -54,8 +38,6 @@ resource "aws_instance" "my_server_scan" {
   tags = {
     Name = "cloudsploit-demo-scanner"
   }
-  #depends_on = [aws_instance.my_server_scan.id]
-  #user_data              = file("user_data.sh")
   user_data = <<-EOF
 #! /bin/bash
 sudo yum install -y epel-release curl git nano htop
