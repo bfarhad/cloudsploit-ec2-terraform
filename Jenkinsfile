@@ -14,7 +14,7 @@ pipeline {
         stage('Terraform Init') {
             steps {
                 script {
-                    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: (credentialsId) ]]) { 
+                    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: (credentialsId),usernameVariable: 'TF_VAR_AWS_ACCESS_KEY_ID', passwordVariable: 'TF_VAR_AWS_SECRET_ACCESS_KEY' ]]) { 
                         sh"""
                             terraform init -input=false
                         """
