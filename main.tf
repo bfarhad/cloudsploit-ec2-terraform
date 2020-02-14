@@ -1,5 +1,6 @@
 provider "aws" {
   region = "eu-west-1"
+  provider.aws: version = "~> 2.49"
 }
 
 resource "aws_iam_user" "cloudsploit" {
