@@ -46,7 +46,7 @@ pipeline {
                 script {
                     withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: (credentialsId) ]]) { 
                         sh"""
-                            terraform ${terraformChoice}
+                            terraform ${terraformChoice} -input=false -auto-approve
                         """
                     }
                 }
