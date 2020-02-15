@@ -9,15 +9,15 @@ output "this_iam_user_arn" {
 }
 
 output "elastic_ip" {
-  value = "${aws_eip.my_static_ip.public_ip}"
+  value = aws_eip.my_static_ip.public_ip
 }
 
 output "id" {
-  value = "${aws_iam_access_key.cloudsploit.id}"
+  value = aws_iam_access_key.cloudsploit.id
 }
 
 output "secret" {
-  value = "${aws_iam_access_key.cloudsploit.encrypted_secret}"
+  value = "aws_iam_access_key.cloudsploit.encrypted_secret"
 }
 
 output "aws_keypair_name" {

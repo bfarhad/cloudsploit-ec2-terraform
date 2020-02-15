@@ -9,17 +9,18 @@ variable "aws_region" {
 variable "s3_bucket" {
   default = "logbucket-tf-test-c"
 }
+
 variable "key_name" {
   default = "ec2-cloudsploit-key"
 }
 
 variable "username" {
-  type = "string"
+  type = string
   default = "cloudsploit"
 }
 
 variable "security_audit_arn" {
-  type = "string"
+  type = string
   default = "arn:aws:iam::aws:policy/SecurityAudit"
 }
 
@@ -28,11 +29,13 @@ variable "ami_id" {
   default = "ami-192a9460"
 }
 
-variable "vpc_id" {
-  default = "vpc-4b030a2e"
-}
+#variable "key_name" { }
 
-variable "subnet_pub_C" {
-  description = "default VPC subnet"
-  default = "subnet-65d2ca12"
-}
+variable "vpc_id" { }
+
+variable "subnet_pub_C" { }
+
+variable "AWS_ACCESS_KEY_ID" { }
+
+variable "AWS_SECRET_ACCESS_KEY" { }
+

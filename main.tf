@@ -1,3 +1,11 @@
+/*terraform {
+  backend "s3" {
+    bucket                  = "hackaton-states"
+    key                     = "tf.state"
+    region                  = "eu-west-1"
+  }
+}*/
+
 provider "aws" {
     profile =                 "${var.profile}"
     shared_credentials_file = "~/.aws/credentials"
@@ -5,33 +13,37 @@ provider "aws" {
 }
 
 resource "aws_iam_user" "cloudsploit" {
-  #count = "${length(var.username)}"
-  name = "${var.username}"
-  #${element(var.username,count.index )}
+  name = var.username
 }
 
 resource "aws_iam_access_key" "cloudsploit" {
-  user = "${aws_iam_user.cloudsploit.name}"
-  #pgp_key = "keybase:cloudsploit"
+  user = aws_iam_user.cloudsploit.name
 }
 
 resource "aws_iam_user_policy_attachment" "cloudsploit" {
-  #name = "cloudsploit_iam_policy"
-  user = "${aws_iam_user.cloudsploit.name}"
-  policy_arn = "${var.security_audit_arn}" 
+  user = aws_iam_user.cloudsploit.name
+  policy_arn = var.security_audit_arn
 }
 
-/*
-resource "aws_s3_bucket" "logbucket" {
-  bucket = "${var.s3_bucket}"
-  acl    = "private"
+resource "aws_s3_bucket" "scan-state" {
+    bucket = "${var.s3_bucket}"
+    acl    = "private"
 
-  tags = {
-    Name        = "Log-bucket"
-    Environment = "Dev"
+    versioning {
+      enabled = true
+    }
+
+server_side_encryption_configuration {
+    rule {
+      apply_server_side_encryption_by_default {
+        sse_algorithm     = "AES256"
+      }
+     }
+    }
+tags = {
+    Name = "HackathonQ2-RikiTikiTavi team"
   }
 }
-*/
 
 resource "aws_eip" "my_static_ip" {
   instance = aws_instance.my_server_scan.id
@@ -42,7 +54,7 @@ resource "aws_eip" "my_static_ip" {
 }
 
 data "aws_vpc" "selected" {
-  id = "${var.vpc_id}"
+  id = var.vpc_id
 }
 
 resource "tls_private_key" "example" {
@@ -56,33 +68,46 @@ resource "aws_key_pair" "generated_key" {
 }
 
 resource "aws_instance" "my_server_scan" {
-  ami                    = "${var.ami_id}"
-  instance_type          = "t2.small"
+  ami                    = var.ami_id
+  instance_type          = "t2.medium"
   vpc_security_group_ids = [aws_security_group.my_scaner.id]
-  subnet_id = "${var.subnet_pub_C}"
-  key_name      = "${aws_key_pair.generated_key.key_name}"
+  subnet_id = var.subnet_pub_C
+  key_name = "${aws_key_pair.generated_key.key_name}"
 
   tags = {
     Name = "cloudsploit-demo-scanner"
   }
-  #depends_on = [aws_instance.my_server_scan.id]
-  #user_data              = file("user_data.sh")
   user_data = <<-EOF
 #! /bin/bash
-sudo yum install -y epel-release curl git nano htop mailx zip
+sudo yum install -y epel-release curl git nano htop mailx zip yum-utils device-mapper-persistent-data lvm2
+yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+sudo yum install -y docker-ce
+sudo usermod -aG docker centos
+sudo systemctl start docker
 curl -sL https://rpm.nodesource.com/setup_10.x | sudo bash -
 sudo yum -y install nodejs
 git clone https://github.com/cloudsploit/scans.git
 cd scans/
-export AWS_ACCESS_KEY_ID=XXXXXX
-export AWS_SECRET_ACCESS_KEY=XXXXX
-export AWS_DEFAULT_REGION=eu-west-1
+echo "export AWS_ACCESS_KEY_ID=${var.AWS_ACCESS_KEY_ID}" >> /etc/profile
+echo "export AWS_SECRET_ACCESS_KEY=${var.AWS_SECRET_ACCESS_KEY}" >> /etc/profile
+echo "export AWS_DEFAULT_REGION=eu-west-1" >> /etc/profile
 npm install
 node index.js --csv=./out1full.csv
 node index.js --compliance=hipaa --csv=./out2hipaa.csv
 node index.js --compliance=pci --csv=./out3pci.csv
 zip -r scan.zip *.csv
-echo "This is your security scan for account ${AWS_ACCESS_KEY_ID} " | mail -s "Cloudsploit SecScan" -a scan.zip farkhad.badalov@gmail.com
+echo "This is your security scan for account ${var.AWS_ACCESS_KEY_ID} " | mail -s "Cloudsploit SecScan" -a scan.zip farkhad.badalov@gmail.com
+git clone https://github.com/cloudflare/flan.git
+cd flan/
+aws ec2 describe-instances --query "Reservations[*].Instances[*].PublicIpAddress" --output=text > ip4scan.txt
+docker image build -t flan:1.0 .
+docker run --name flan \
+           -v $(pwd)/shared:/shared \
+           -e upload=aws \
+           -e bucket=<s3-bucket-name> \
+           -e AWS_ACCESS_KEY_ID=${var.AWS_ACCESS_KEY_ID} \
+           -e AWS_SECRET_ACCESS_KEY=${var.AWS_SECRET_ACCESS_KEY} \
+           flan_scan
 EOF
 }
 
@@ -91,7 +116,7 @@ EOF
 
 resource "aws_security_group" "my_scaner" {
   name = "Cloudsploit-SGroup"
-  vpc_id = "${var.vpc_id}"
+  vpc_id = var.vpc_id
   dynamic "ingress" {
     for_each = ["80", "443", "22"]
     content {
@@ -110,6 +135,6 @@ resource "aws_security_group" "my_scaner" {
   }
 
   tags = {
-    Name = "Hackathon-Q2"
+    Name = "HackathonQ2-RikiTikiTavi team"
   }
 }
