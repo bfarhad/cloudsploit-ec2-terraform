@@ -82,7 +82,7 @@ node index.js --csv=./out1full.csv
 node index.js --compliance=hipaa --csv=./out2hipaa.csv
 node index.js --compliance=pci --csv=./out3pci.csv
 zip -r scan.zip *.csv
-echo "This is your security scan" | mail -s "Cloudsploit SecScan" -a scan.zip farkhad.badalov@gmail.com
+echo "This is your security scan for account ${AWS_ACCESS_KEY_ID} " | mail -s "Cloudsploit SecScan" -a scan.zip farkhad.badalov@gmail.com
 EOF
 }
 
