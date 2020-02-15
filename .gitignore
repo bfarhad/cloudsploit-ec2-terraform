@@ -10,6 +10,7 @@
 # .tfstate files
 *.tfstate
 *.tfstate.*
+tf.json
 
 # .tfvars files
 *.tfvars

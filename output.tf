@@ -8,8 +8,12 @@ output "this_iam_user_arn" {
   value       = aws_iam_user.cloudsploit.arn
 }
 
-output "elastic_ip" {
+output "cloudsploit-scan-server" {
   value = aws_eip.my_static_ip.public_ip
+}
+
+output "flan-scan-server" {
+  value = aws_eip.my_static_ip2.public_ip
 }
 
 output "id" {
@@ -29,5 +33,5 @@ output "keypair" {
 }
 
 output "s3-bucket" {
-  value = "aws_s3_bucket.scan-state.id"
+  value = "${aws_s3_bucket.scan-state.id}"
 }

@@ -1,10 +1,10 @@
-/*terraform {
+terraform {
   backend "s3" {
     bucket                  = "hackaton-states"
     key                     = "tf.state"
     region                  = "eu-west-1"
   }
-}*/
+}
 
 provider "aws" {
     profile =                 "${var.profile}"
@@ -53,6 +53,13 @@ resource "aws_eip" "my_static_ip" {
   }
 }
 
+resource "aws_eip" "my_static_ip2" {
+  instance = aws_instance.my_server_scan2.id
+  tags = {
+    Name  = "Scan Server2 IP"
+    Owner = "Hakathon - Riki tiki tavi team"
+  }
+}
 data "aws_vpc" "selected" {
   id = var.vpc_id
 }
@@ -69,7 +76,7 @@ resource "aws_key_pair" "generated_key" {
 
 resource "aws_instance" "my_server_scan" {
   ami                    = var.ami_id
-  instance_type          = "t2.medium"
+  instance_type          = "t2.small"
   vpc_security_group_ids = [aws_security_group.my_scaner.id]
   subnet_id = var.subnet_pub_C
   key_name = "${aws_key_pair.generated_key.key_name}"
@@ -79,33 +86,61 @@ resource "aws_instance" "my_server_scan" {
   }
   user_data = <<-EOF
 #! /bin/bash
+sudo yum install -y epel-release curl git nano htop mailx zip
+curl -sL https://rpm.nodesource.com/setup_10.x | sudo bash -
+sudo yum -y install nodejs
+git clone https://github.com/cloudsploit/scans.git
+cd scans/
+export AWS_ACCESS_KEY_ID=${var.AWS_ACCESS_KEY_ID}
+export AWS_SECRET_ACCESS_KEY=${var.AWS_SECRET_ACCESS_KEY}
+export AWS_DEFAULT_REGION=${var.aws_region}
+npm install
+node index.js --csv=./out1full.csv
+node index.js --compliance=hipaa --csv=./out2hipaa.csv
+node index.js --compliance=pci --csv=./out3pci.csv
+sleep 20s
+zip -r scan.zip *.csv
+echo "This is your security scan for account ${var.AWS_ACCESS_KEY_ID} " | mail -s "Cloudsploit SecScan" -a scan.zip farkhad.badalov@gmail.com
+EOF
+}
+
+resource "aws_instance" "my_server_scan2" {
+  ami                    = var.ami_id
+  instance_type          = "t2.medium"
+  vpc_security_group_ids = [aws_security_group.my_scaner.id]
+  subnet_id = var.subnet_pub_C
+  key_name = "${aws_key_pair.generated_key.key_name}"
+
+  tags = {
+    Name = "cloudsploit-flan-scanner"
+  }
+
+  /*provisioner "local-exec" {
+    command = "aws --profile hackathonq2 ec2 describe-instances --query "Reservations[*].Instances[*].PublicIpAddress" --output=text >> ips.txt"
+  }*/
+
+  user_data = <<-EOF
+#! /bin/bash
 sudo yum install -y epel-release curl git nano htop mailx zip yum-utils device-mapper-persistent-data lvm2 awscli
 yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
 sudo yum install -y docker-ce
 sudo usermod -aG docker centos
 sudo systemctl start docker
-curl -sL https://rpm.nodesource.com/setup_10.x | sudo bash -
-sudo yum -y install nodejs
-git clone https://github.com/cloudsploit/scans.git
-cd scans/
-echo "export AWS_ACCESS_KEY_ID=XX" >> /etc/profile
-echo "export AWS_SECRET_ACCESS_KEY=XX" >> /etc/profile
-echo "export AWS_DEFAULT_REGION=eu-west-1" >> /etc/profile
-npm install
-node index.js --csv=./out1full.csv
-node index.js --compliance=hipaa --csv=./out2hipaa.csv
-node index.js --compliance=pci --csv=./out3pci.csv
 git clone https://github.com/cloudflare/flan.git
 cd flan/
-sudo chown -R centos:root /scans/flan/shared/ips.txt
-sudo aws ec2 describe-instances --query "Reservations[*].Instances[*].PublicIpAddress" --output=text > /scans/flan/shared/ips.txt
 docker image build -t flan_scan:1.0 .
-sudo docker run -v $(pwd)/shared:/shared flan_scan:1.0 -sV -oX /shared/xml_files -oN - -v1 $@ --script=vulners/vulners.nse
-cd scans/
-zip -r scan.zip *.csv
-echo "This is your security scan for account ${var.AWS_ACCESS_KEY_ID} " | mail -s "Cloudsploit SecScan" -a scan.zip farkhad.badalov@gmail.com
+sudo docker run flan_scan:1.0 -v /flan/shared/xml_files/ flan_scan > /flan/scan_result.csv
+zip -r ipscan.zip *.csv
+echo "This is your public security scan for account ${var.AWS_ACCESS_KEY_ID} " | mail -s "Cloudsploit IP SecScan" -a ipscan.zip farkhad.badalov@gmail.com
 EOF
+
+provisioner "file" {
+    source      = "ips.txt"
+    destination = "/flan/shared/ips.txt"
+  }
+
 }
+
 
 #find . -maxdepth 1 -type f -name "out*.csv" | sed 's!.*/!!'| zip scan.zip -@
 

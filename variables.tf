@@ -1,5 +1,5 @@
 variable "profile" {
-  default = "hackathonq2"
+  default = "devops-dev"
 }
 
 variable "aws_region" {
