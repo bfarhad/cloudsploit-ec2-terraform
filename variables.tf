@@ -1,5 +1,5 @@
 variable "profile" {
-  default = "devops-dev"
+  default = "yourprofile"
 }
 
 variable "aws_region" {
@@ -38,4 +38,6 @@ variable "subnet_pub_C" { }
 variable "AWS_ACCESS_KEY_ID" { }
 
 variable "AWS_SECRET_ACCESS_KEY" { }
+
+variable "recepient_mail" { }
 

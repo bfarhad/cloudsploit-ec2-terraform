@@ -1,10 +1,10 @@
-terraform {
+/*terraform {
   backend "s3" {
-    bucket                  = "hackaton-states"
+    bucket                  = "sandbox-tfstate-bucket"
     key                     = "tf.state"
     region                  = "eu-west-1"
   }
-}
+}*/
 
 provider "aws" {
     profile =                 "${var.profile}"
@@ -100,7 +100,7 @@ node index.js --compliance=hipaa --csv=./out2hipaa.csv
 node index.js --compliance=pci --csv=./out3pci.csv
 sleep 20s
 zip -r scan.zip *.csv
-echo "This is your security scan for account ${var.AWS_ACCESS_KEY_ID} " | mail -s "Cloudsploit SecScan" -a scan.zip farkhad.badalov@gmail.com
+echo "This is your security scan for account ${var.AWS_ACCESS_KEY_ID} " | mail -s "Cloudsploit SecScan" -a scan.zip ${var.recepient_mail}
 EOF
 }
 
@@ -115,10 +115,6 @@ resource "aws_instance" "my_server_scan2" {
     Name = "cloudsploit-flan-scanner"
   }
 
-  /*provisioner "local-exec" {
-    command = "aws --profile hackathonq2 ec2 describe-instances --query "Reservations[*].Instances[*].PublicIpAddress" --output=text >> ips.txt"
-  }*/
-
   user_data = <<-EOF
 #! /bin/bash
 sudo yum install -y epel-release curl git nano htop mailx zip yum-utils device-mapper-persistent-data lvm2 awscli
@@ -127,22 +123,16 @@ sudo yum install -y docker-ce
 sudo usermod -aG docker centos
 sudo systemctl start docker
 git clone https://github.com/cloudflare/flan.git
+curl https://raw.githubusercontent.com/bfarhad/cloudsploit-ec2-terraform/extenden/ips.txt --output /flan/shared/ips.txt
 cd flan/
 docker image build -t flan_scan:1.0 .
 sudo docker run flan_scan:1.0 -v /flan/shared/xml_files/ flan_scan > /flan/scan_result.csv
 zip -r ipscan.zip *.csv
-echo "This is your public security scan for account ${var.AWS_ACCESS_KEY_ID} " | mail -s "Cloudsploit IP SecScan" -a ipscan.zip farkhad.badalov@gmail.com
+echo "This is your public security scan for account ${var.AWS_ACCESS_KEY_ID} " | mail -s "Cloudsploit IP SecScan" -a ipscan.zip ${var.recepient_mail}
 EOF
 
-provisioner "file" {
-    source      = "ips.txt"
-    destination = "/flan/shared/ips.txt"
-  }
 
 }
-
-
-#find . -maxdepth 1 -type f -name "out*.csv" | sed 's!.*/!!'| zip scan.zip -@
 
 
 resource "aws_security_group" "my_scaner" {
