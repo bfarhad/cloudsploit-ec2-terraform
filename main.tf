@@ -79,7 +79,7 @@ resource "aws_instance" "my_server_scan" {
   }
   user_data = <<-EOF
 #! /bin/bash
-sudo yum install -y epel-release curl git nano htop mailx zip yum-utils device-mapper-persistent-data lvm2
+sudo yum install -y epel-release curl git nano htop mailx zip yum-utils device-mapper-persistent-data lvm2 awscli
 yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
 sudo yum install -y docker-ce
 sudo usermod -aG docker centos
@@ -88,26 +88,22 @@ curl -sL https://rpm.nodesource.com/setup_10.x | sudo bash -
 sudo yum -y install nodejs
 git clone https://github.com/cloudsploit/scans.git
 cd scans/
-echo "export AWS_ACCESS_KEY_ID=${var.AWS_ACCESS_KEY_ID}" >> /etc/profile
-echo "export AWS_SECRET_ACCESS_KEY=${var.AWS_SECRET_ACCESS_KEY}" >> /etc/profile
+echo "export AWS_ACCESS_KEY_ID=XX" >> /etc/profile
+echo "export AWS_SECRET_ACCESS_KEY=XX" >> /etc/profile
 echo "export AWS_DEFAULT_REGION=eu-west-1" >> /etc/profile
 npm install
 node index.js --csv=./out1full.csv
 node index.js --compliance=hipaa --csv=./out2hipaa.csv
 node index.js --compliance=pci --csv=./out3pci.csv
-zip -r scan.zip *.csv
-echo "This is your security scan for account ${var.AWS_ACCESS_KEY_ID} " | mail -s "Cloudsploit SecScan" -a scan.zip farkhad.badalov@gmail.com
 git clone https://github.com/cloudflare/flan.git
 cd flan/
-aws ec2 describe-instances --query "Reservations[*].Instances[*].PublicIpAddress" --output=text > ip4scan.txt
-docker image build -t flan:1.0 .
-docker run --name flan \
-           -v $(pwd)/shared:/shared \
-           -e upload=aws \
-           -e bucket=<s3-bucket-name> \
-           -e AWS_ACCESS_KEY_ID=${var.AWS_ACCESS_KEY_ID} \
-           -e AWS_SECRET_ACCESS_KEY=${var.AWS_SECRET_ACCESS_KEY} \
-           flan_scan
+sudo chown -R centos:root /scans/flan/shared/ips.txt
+sudo aws ec2 describe-instances --query "Reservations[*].Instances[*].PublicIpAddress" --output=text > /scans/flan/shared/ips.txt
+docker image build -t flan_scan:1.0 .
+sudo docker run -v $(pwd)/shared:/shared flan_scan:1.0 -sV -oX /shared/xml_files -oN - -v1 $@ --script=vulners/vulners.nse
+cd scans/
+zip -r scan.zip *.csv
+echo "This is your security scan for account ${var.AWS_ACCESS_KEY_ID} " | mail -s "Cloudsploit SecScan" -a scan.zip farkhad.badalov@gmail.com
 EOF
 }
 

@@ -27,3 +27,7 @@ output "aws_keypair_name" {
 output "keypair" {
   value = "${tls_private_key.example.private_key_pem}"
 }
+
+output "s3-bucket" {
+  value = "aws_s3_bucket.scan-state.id"
+}
