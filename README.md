@@ -1,5 +1,15 @@
-# cloudsploit-ec2-terraform
+# Cloud environment security scanners with Cloudsploit and Flan scan
+
+This repo and code placed here describe idea how to use the slave ec2 instances for producing scan of AWS account with Cloudsploit and flan scan for obtaining clear picture regarding security lacs inside and ouside of account. 
 PoC for provisioning ec2 instance with installed Node.JS and Cloudsploit code for scan cloud account for vulnerabilities.
+
+Requirements 
+
+- Centos ec2 instance (we used AMI ID for Ireland area)
+- Already provisioned VPC with public subnet (Default also can be used)
+- AWS account with administrative credentials
+- Jenkins instance with pre-installed aws cli and terraform
+
 
 Repository with Cloudsploit code and settings explanation 
 https://github.com/cloudsploit/scans
