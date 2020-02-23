@@ -2,6 +2,9 @@
 
 This repo and code placed here describe idea how to use the slave ec2 instances for producing scan of AWS account with Cloudsploit and flan scan for obtaining clear picture regarding security lacks inside and ouside of account. 
 
+![Conception](/images/conception.png)
+Format: ![Alt Text](url)
+
 Requirements:
 - Centos7 Linux ec2 instance ID (we used AMI ID for Ireland area - hardcoded in main.tf)
 - Already provisioned VPC with public subnet (Default also can be used)
@@ -21,6 +24,9 @@ Application procedure
 2. Create the Jenkins pipeline and input the URL of your repo;
 3. During initial build select apply and get the results of scan;
 4. Run pipe one more time and select destroy for removing the scanner instances;
+
+![Jenkins exec](/images/jenkins_exec.png)
+Format: ![Alt Text](url)
 
 Terraform plan which will be launched by Jenkins will do the next:
 1. Provisioning of 2 x ec2 instance (t2.medium type) with generation of access keys in AWS account with preesented credentials. 1st instance name will be Scanner sploit nad second one Scanner Flan.
