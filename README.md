@@ -29,7 +29,9 @@ Terraform plan which will be launched by Jenkins will do the next:
 4. Packing of results of scan and sent it with mailx on mail inputed as variables in Jenkins file.
 
 What next:
+
 A. Containerization of app and run it as permament Jenkins job.
+
 B. Integration of Azure, Github and Google CP for scanning it by demand.
 
 P.S. DON'T FORGET TO CREATE credentials.tfvars and proper S3 bucket for state in place where it will be run BEFORE FIRST RUN!
