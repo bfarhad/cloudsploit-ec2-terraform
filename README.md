@@ -3,7 +3,7 @@
 This repo and code placed here describe idea how to use the slave ec2 instances for producing scan of AWS account with Cloudsploit and flan scan for obtaining clear picture regarding security lacks inside and ouside of account. 
 
 Requirements:
-- Centos ec2 instance ID (we used AMI ID for Ireland area - hardcoded in main.tf)
+- Centos7 Linux ec2 instance ID (we used AMI ID for Ireland area - hardcoded in main.tf)
 - Already provisioned VPC with public subnet (Default also can be used)
 - AWS account with administrative credentials
 - Jenkins instance with pre-installed aws cli and terraform
