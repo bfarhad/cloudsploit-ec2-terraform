@@ -5,9 +5,9 @@ pipeline {
     environment{
         AWS_DEFAULT_REGION = "eu-west-1" 
         credentialsId = 'jenkinsCiCd'
-        TF_VAR_vpc_id = 'vpc-09cf4efbd803372b6'
-        TF_VAR_subnet_pub_C = 'subnet-09fd71f109d04d274'
-        TF_VAR_recipient_email = 'vadims.stavro@gmail.com'
+        TF_VAR_vpc_id = ''
+        TF_VAR_subnet_pub_C = ''
+        TF_VAR_recipient_email = ''
     }
 
     stages{
