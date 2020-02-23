@@ -10,7 +10,9 @@ Requirements:
 Also you'll need manually modify Jenkins file for adding variables and add JenkinsCiCd key (with using CloudBees AWS credentials plugin);
 
 Repository with Cloudsploit and flan scanner code and settings explanation
+
 https://github.com/cloudsploit/scans
+
 https://github.com/cloudflare/flan
 
 Application procedure
@@ -27,7 +29,7 @@ Terraform plan which will be launched by Jenkins will do the next:
 4. Packing of results of scan and sent it with mailx on mail inputed as variables in Jenkins file.
 
 What next:
-A. Containerization of app and run it as Jenkins job with step 4,5,6
-B. Integration of Azure, Github and Google CP for scanning
+A. Containerization of app and run it as permament Jenkins job.
+B. Integration of Azure, Github and Google CP for scanning it by demand.
 
 P.S. DON'T FORGET TO CREATE credentials.tfvars and proper S3 bucket for state in place where it will be run BEFORE FIRST RUN!
