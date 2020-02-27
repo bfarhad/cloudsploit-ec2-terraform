@@ -4,7 +4,7 @@ pipeline {
 
     environment{
         AWS_DEFAULT_REGION = "eu-west-1" 
-        credentialsId = 'jenkinsCiCd' // aws credentials in Jenkins (ID)
+        credentialsId = 'CloudsploitDemo' // aws credentials in Jenkins (ID)
     }
 
     stages{
