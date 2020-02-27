@@ -1,6 +1,6 @@
 terraform {
   backend "s3" {
-    bucket = "hackaton-states"
+    bucket = "tf-statedemo"
     key = "tf.state"
     region = "eu-west-1"
   }
