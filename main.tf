@@ -46,7 +46,7 @@ node index.js --csv=./out1full.csv
 node index.js --compliance=hipaa --csv=./out2hipaa.csv
 node index.js --compliance=pci --csv=./out3pci.csv
 zip -r scan.zip *.csv
-echo "This is your security scan for access key ${var.AWS_ACCESS_KEY_ID} " | mail -s "Cloudsploit SecScan" -a scan.zip ${var.recipient_email}
+echo "This is your security scan for access key ${var.AWS_ACCESS_KEY_ID} " | mailx -s "Cloudsploit SecScan" -a scan.zip ${var.recipient_email}
 EOF
 }
 
@@ -76,7 +76,7 @@ cd flan/
 docker image build -t flan_scan:1.0 .
 sudo docker run flan_scan:1.0 -v /flan/shared/xml_files/ flan_scan > /flan/scan_result.csv
 zip -r ipscan.zip *.csv
-echo "This is your public security scan for account ${var.AWS_ACCESS_KEY_ID} " | mail -s "Cloudsploit IP SecScan" -a ipscan.zip ${var.recipient_email}
+echo "This is your public security scan for account ${var.AWS_ACCESS_KEY_ID} " | mailx -s "Cloudsploit IP SecScan" -a ipscan.zip ${var.recipient_email}
 EOF
 }
 
